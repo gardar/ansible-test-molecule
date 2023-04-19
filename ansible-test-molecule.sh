@@ -56,5 +56,5 @@ unset _ANSIBLE_COVERAGE_CONFIG
 unset ANSIBLE_PYTHON_INTERPRETER
 
 # Run molecule test
-cd "$role_root"
+cd "$role_root" || exit
 molecule -c "$collection_root/.config/molecule/config.yml" test -s "$scenario"
