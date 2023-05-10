@@ -11,10 +11,17 @@ role=$(expr "$targetname" : '\w*-\(\w*\)-\w*')
 role_root="$collection_root/roles/$role"
 scenario=$(expr "$targetname" : '\w*-\w*-\(\w*\)')
 ansible_version="$(ansible --version | head -1 | sed 's/[^0-9\.]*//g')"
+ansible_os_family="$(ansible localhost -m setup -a 'gather_subset=!all,!min,os_family filter=ansible_os_family' 2>/dev/null | grep -oP '(?<=ansible_os_family": ")[^"]+')"
+declare -A pkgs=(
+  ["debian"]="docker.io"
+  ["redhat"]="docker"
+)
 
 # Install package requirements
-apt -y update
-apt -y install docker.io
+if [[ -v "pkgs[${ansible_os_family,,}]" ]]; then
+  packages=${pkgs[${ansible_os_family,,}]}
+  ansible localhost -m packages -a "name=$packages update_cache=true"
+fi
 
 # Install test requirements from role
 if [ -f "$role_root/test-requirements.txt"  ]; then
