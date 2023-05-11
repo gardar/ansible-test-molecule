@@ -24,11 +24,11 @@ if [[ -v "pkg[${ansible_os_family,,}]" ]]; then
 fi
 
 # Install test requirements from role
-if [ -f "$role_root/test-requirements.txt"  ]; then
+if [ -f "$role_root/test-requirements.txt" ]; then
 	python -m pip install -r "$role_root/test-requirements.txt"
 fi
 # Install test requirements from collection
-if [ -f "$collection_root/test-requirements.txt"  ]; then
+if [ -f "$collection_root/test-requirements.txt" ]; then
 	python -m pip install -r "$collection_root/test-requirements.txt"
 fi
 
@@ -44,7 +44,7 @@ elif [ "$(printf '%s\n' "2.10" "$ansible_version" | sort -V | head -n1)" = "2.10
 else
 	python -m pip install molecule molecule-docker
 	req_dir=$(mktemp -d)
-	requirements="$(awk '/name:/ {print $3}' < "$collection_root/requirements.yml") https://github.com/ansible-collections/community.docker.git"
+	requirements="$(awk '/name:/ {print $3}' <"$collection_root/requirements.yml") https://github.com/ansible-collections/community.docker.git"
 	for req in $requirements; do
 		git -C "$req_dir" clone --single-branch --depth 1 "$req"
 		req="${req##*/}"
