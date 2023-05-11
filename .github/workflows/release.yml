@@ -1,51 +1,49 @@
 ---
 name: Release
-
 on:
-  push:
-    branches:
-      - main
+  pull_request_target:
+    types:
+      - closed
 
 jobs:
   release:
-    name: Release
+    if: |
+      github.event.pull_request.merged &&
+      !contains(github.event.pull_request.labels.*.name, 'skip_changelog')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # it's necessary to fetch all tags
+          fetch-depth: 0
 
-      - name: Semantic Release
-        id: semantic
-        uses: cycjimmy/semantic-release-action@v2
-        with:
-          branch: main
-          extra_plugins: |
-            @semantic-release/git
+      - name: "Calculate next version"
+        id: version
+        uses: gardar/version-drafter-action@event-triggers  # Until PR gets merged: https://github.com/patrickjahns/version-drafter-action/pull/343
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
-          GIT_AUTHOR_NAME: github-actions[bot]
-          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
-          GIT_COMMITTER_NAME: github-actions[bot]
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::$(echo $RELEASE_VERSION | cut -c 2-)
-
-      - name: Update version in bash script
+      - name: "Update version"
         run: |
           sed -i "s/^# Version:.*/# Version: ${VERSION}/" ansible-test-molecule.sh
         env:
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          VERSION: "${{ steps.version.outputs.next-version }}"
 
-      - name: Commit and push
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ansible-test-molecule.sh
-          git commit -m "chore: bump version to ${VERSION}"
-          git push
+      - name: "Write version"
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: "${{ github.event.pull_request.base.ref }}"
+          commit_message: "chore: update version"
+          push_options: --force
+
+      - name: "Checkout updated branch"
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ github.event.pull_request.base.ref }}"
+
+      - name: "Publish release"
+        id: release-publish
+        uses: release-drafter/release-drafter@v5
         env:
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
