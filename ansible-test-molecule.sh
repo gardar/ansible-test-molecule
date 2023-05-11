@@ -6,7 +6,7 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 #
-# Version: 0.0.1
+# Version: 0.1.0
 
 
 collection_root=$(pwd | grep -oP ".+\/ansible_collections\/\w+?\/\w+")
