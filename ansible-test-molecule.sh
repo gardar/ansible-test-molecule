@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
 # Copyright 2022 Gardar Arnarsson
+# https://github.com/gardar/ansible-test-molecule
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
+#
+# Version: 0.0.1
+
 
 collection_root=$(pwd | grep -oP ".+\/ansible_collections\/\w+?\/\w+")
 target=${PWD##*/}
