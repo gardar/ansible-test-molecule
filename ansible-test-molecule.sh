@@ -21,6 +21,31 @@ declare -A pkg=(
 	["redhat"]="docker"
 )
 
+check_version() {
+    # Parse the current version
+    local current_version
+    current_version=$(grep -oP '(?<=# Version: )[\d\.]+' "$0")
+
+    local gh_api="https://api.github.com/repos/gardar/ansible-test-molecule/releases/latest"
+
+    # Lookup latest version
+    # Use GITHUB_TOKEN if available, to avoid rate limit
+    if [[ -v GITHUB_TOKEN ]]
+    then
+        latest_version=$(curl -s -H "Authorization: token $GITHUB_TOKEN" $gh_api | grep tag_name | cut -d : -f 2 | tr -d '", \n')
+    else
+        latest_version=$(curl -s $gh_api | grep tag_name | cut -d : -f 2 | tr -d '", \n')
+    fi
+
+    # Check if a new version exists
+    if [[ "$latest_version" != "$current_version" ]]
+    then
+        echo "A new version of 'ansible-test-molecule' is available: $latest_version" >&2
+    fi
+}
+
+check_version
+
 # Install package requirements
 if [[ -v "pkg[${ansible_os_family,,}]" ]]; then
 	packages=${pkg[${ansible_os_family,,}]}
