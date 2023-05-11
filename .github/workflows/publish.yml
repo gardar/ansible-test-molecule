@@ -1,0 +1,20 @@
+---
+name: Publish
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Upload built collection to release"
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          file: ansible-test-molecule.sh
+          tag: "${{ github.ref }}"
+          overwrite: true
