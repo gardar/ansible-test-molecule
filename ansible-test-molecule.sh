@@ -10,10 +10,10 @@
 
 # Set variables
 collection_root=$(pwd | grep -oP ".+\/ansible_collections\/\w+?\/\w+")
-role_root="$collection_root/roles/$role"
 target=${PWD##*/}
-role=$(expr "$target" : '\w*-\(\w*\)-\w*')
 scenario=$(expr "$target" : '\w*-\w*-\(\w*\)')
+role=$(expr "$target" : '\w*-\(\w*\)-\w*')
+role_root="$collection_root/roles/$role"
 ansible_version="$(ansible --version | head -1 | sed 's/[^0-9\.]*//g')"
 ansible_os_family="$(ansible localhost -m setup -a 'gather_subset=!all,!min,os_family filter=ansible_os_family' 2>/dev/null | grep -oP '(?<=ansible_os_family": ")[^"]+')"
 molecule_file=$collection_root/.config/molecule/config.yml
