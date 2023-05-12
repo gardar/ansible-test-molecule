@@ -42,14 +42,14 @@ check_version() {
 	# Check if a new version exists
 	if [[ "$latest_version" != "$current_version" ]]
 	then
-		echo "A new version of 'ansible-test-molecule' is available: $latest_version"
+		echo "A new version of 'ansible-test-molecule' is available: $latest_version" >&2
 	fi
 }
 
 install_package_requirements() {
 	if [[ -v "pkg[${ansible_os_family,,}]" ]]; then
 		packages=${pkg[${ansible_os_family,,}]}
-		ansible localhost -m packages -a "name=$packages update_cache=true"
+		ansible localhost -m package -a "name=$packages update_cache=true"
 	fi
 }
 
@@ -101,7 +101,7 @@ run_molecule() {
 
 	# Run molecule test
 	cd "$role_root" || exit
-	molecule -c "$yamllint_config_file" test -s "$scenario"
+	molecule -c "$molecule_file" test -s "$scenario"
 }
 
 main() {
