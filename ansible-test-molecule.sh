@@ -24,26 +24,26 @@ declare -A pkg=(
 )
 
 check_version() {
-    # Parse the current version
-    local current_version
-    current_version=$(grep -oP '(?<=# Version: )[\d\.]+' "$0")
+	# Parse the current version
+	local current_version
+	current_version=$(grep -oP '(?<=# Version: )[\d\.]+' "$0")
 
-    local gh_api="https://api.github.com/repos/gardar/ansible-test-molecule/releases/latest"
+	local gh_api="https://api.github.com/repos/gardar/ansible-test-molecule/releases/latest"
 
-    # Lookup latest version
-    # Use GITHUB_TOKEN if available, to avoid rate limit
-    if [[ -v GITHUB_TOKEN ]]
-    then
-        latest_version=$(curl -s -H "Authorization: token $GITHUB_TOKEN" $gh_api | grep tag_name | cut -d : -f 2 | tr -d '", \n')
-    else
-        latest_version=$(curl -s $gh_api | grep tag_name | cut -d : -f 2 | tr -d '", \n')
-    fi
-
-    # Check if a new version exists
-    if [[ "$latest_version" != "$current_version" ]]
-    then
-        echo "A new version of 'ansible-test-molecule' is available: $latest_version" >&2
-    fi
+	# Lookup latest version
+	# Use GITHUB_TOKEN if available, to avoid rate limit
+	if [[ -v GITHUB_TOKEN ]]
+	then
+		latest_version=$(curl -s -H "Authorization: token $GITHUB_TOKEN" $gh_api | grep tag_name | cut -d : -f 2 | tr -d '", \n')
+	else
+		latest_version=$(curl -s $gh_api | grep tag_name | cut -d : -f 2 | tr -d '", \n')
+	fi
+	
+	# Check if a new version exists
+	if [[ "$latest_version" != "$current_version" ]]
+	then
+		echo "A new version of 'ansible-test-molecule' is available: $latest_version" >&2
+	fi
 }
 
 install_package_requirements() {
@@ -66,7 +66,7 @@ install_pip_requirements() {
 
 install_ansible_requirements() {
 	# Install ansible version specific requirements
-	if [ "$(printf '%s\n' "2.12" "$ansible_version" | sort -V | head -n1)" = "2.12" ]; then 
+	if [ "$(printf '%s\n' "2.12" "$ansible_version" | sort -V | head -n1)" = "2.12" ]; then
 		python -m pip install molecule molecule-plugins[docker]
 		ansible-galaxy collection install git+https://github.com/ansible-collections/community.docker.git
 		[ -f "$collection_root/requirements.yml" ] && ansible-galaxy collection install -r "$collection_root/requirements.yml"
@@ -94,11 +94,11 @@ run_molecule() {
 	# Define config locations within collection
 	export MOLECULE_FILE=$molecule_file
 	export YAMLLINT_CONFIG_FILE=$yamllint_config_file
-	
+
 	# Unset ansible-test variables that break molecule
 	unset _ANSIBLE_COVERAGE_CONFIG
 	unset ANSIBLE_PYTHON_INTERPRETER
-	
+
 	# Run molecule test
 	cd "$role_root" || exit
 	molecule -c "$yamllint_config_file" test -s "$scenario"
