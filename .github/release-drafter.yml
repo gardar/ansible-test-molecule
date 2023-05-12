@@ -37,15 +37,20 @@ version-resolver:
   default: patch
 autolabeler:
   - label: 'skip-changelog'
-    title: '/chore/i'
+    title:
+      - '/chore/i'
   - label: 'bug'
-    title: '/fix/i'
+    title:
+      - '/fix/i'
   - label: 'enhancement'
-    title: '/(enhance|improve)/i'
+    title:
+      - '/(enhance|improve)/i'
   - label: 'feature'
-    title: '/feature/i'
+    title:
+      - '/feature/i'
   - label: 'dreprecated'
-    title: '/deprecat/i'
+    title:
+      - '/deprecat/i'
 change-template: '* $TITLE by @$AUTHOR in #$NUMBER'
 template: |
   What's Changed
