@@ -42,7 +42,7 @@ check_version() {
 	# Check if a new version exists
 	if [[ "$latest_version" != "$current_version" ]]
 	then
-		echo "A new version of 'ansible-test-molecule' is available: $latest_version" >&2
+		echo "A new version of 'ansible-test-molecule' is available: $latest_version"
 	fi
 }
 
